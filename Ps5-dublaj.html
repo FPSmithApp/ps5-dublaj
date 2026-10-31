@@ -8,6 +8,7 @@
 <style>
 :root{--bg:#0e1016;--panel:#171a23;--panel2:#1d212c;--line:#2a2f3d;--text:#e8eaf0;--muted:#8b93a7;--acc:#3b82f6;--ok:#22c55e;--warn:#f59e0b;--bad:#ef4444}
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 "Segoe UI",system-ui,sans-serif}
 header{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 header h1{font-size:18px;margin:0}
@@ -16,18 +17,25 @@ header h1{font-size:18px;margin:0}
 main{max-width:900px;margin:0 auto;padding:12px}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:12px}
 .card h2{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0 0 8px}
-#stage{position:relative;background:#000;border-radius:8px;overflow:hidden;min-height:200px}
-#video{display:block;width:100%;height:auto}
+#stageCard{position:sticky;top:0;z-index:5;box-shadow:0 6px 16px rgba(0,0,0,.45)}
+#stage{position:relative;background:#000;border-radius:8px;overflow:hidden;min-height:180px}
+#vwrap{position:relative}
+#video{display:block;width:100%;height:auto;max-height:52vh;object-fit:contain}
+#ovSub{position:absolute;left:0;right:0;bottom:0;padding:22px 12px 10px;text-align:center;pointer-events:none;background:linear-gradient(transparent,rgba(0,0,0,.8) 40%)}
+#ovSub:has(#trText:empty){background:none}
+#trText{font-size:clamp(17px,4.8vw,26px);font-weight:700;color:#fff;text-shadow:0 1px 3px #000,0 0 8px #000;line-height:1.3}
+#ogText{font-size:12px;color:#c9cfdc;margin-top:3px;text-shadow:0 1px 2px #000}
+#ogText:empty{display:none}
+#stage:fullscreen{display:flex;align-items:center;justify-content:center;width:100vw;height:100vh;border-radius:0}
+#stage:fullscreen #vwrap,#stage:fullscreen #video{width:100%;height:100%;max-height:none}
+#stage:fullscreen #overlay{display:none}
+#stage:fullscreen #trText{font-size:clamp(22px,4vw,40px)}
+#stage:fullscreen #ovSub{padding-bottom:5vh}
 #overlay{position:absolute;left:0;top:0;touch-action:none}
 #ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--muted);text-align:center;padding:20px}
 #live{margin-top:8px;padding:8px 10px;background:var(--panel2);border-radius:8px;font-size:13px;color:var(--muted);word-break:break-word}
 #live b{color:var(--text)}
 .hint{color:var(--muted);font-size:13px;margin:6px 0 0}
-#subBox{background:#000;border-radius:10px;padding:16px;min-height:110px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:8px}
-#subBox:fullscreen{justify-content:flex-end;padding-bottom:8vh}
-#trText{font-size:clamp(20px,5.5vw,30px);font-weight:600;color:#fff}
-#subBox:fullscreen #trText{font-size:48px}
-#ogText{color:var(--muted);font-size:14px}
 label.row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:8px 0}
 label.row span.v{color:var(--acc);min-width:38px;text-align:right;font-variant-numeric:tabular-nums}
 .rg{display:flex;align-items:center;gap:6px}
@@ -62,6 +70,19 @@ ol{padding-left:18px;margin:8px 0}li{margin:4px 0}
 </header>
 
 <main>
+  <div class="card" id="stageCard">
+    <div id="stage">
+      <div id="vwrap"><video id="video" muted playsinline></video><canvas id="overlay"></canvas></div>
+      <div id="ph">"Telefon kamerasını aç" deyin ve telefonu TV'ye doğrultun</div>
+      <div id="ovSub"><div id="trText"></div><div id="ogText"></div></div>
+    </div>
+    <div id="live">Alt yazı otomatik bulunacak. İsterseniz parmağınızla bölgeyi kendiniz de çizebilirsiniz.</div>
+    <div class="btns" style="margin-top:8px">
+      <button id="btnAuto">🔍 Otomatik bul</button>
+      <button id="fsBtn">⛶ Tam ekran (yatay)</button>
+    </div>
+  </div>
+
   <div class="card">
     <button id="btnPhone" class="primary big">📱 Telefon kamerasını aç</button>
     <label class="row">Mod
@@ -86,28 +107,6 @@ ol{padding-left:18px;margin:8px 0}li{margin:4px 0}
     <label class="row" id="zoomRow" hidden>Yakınlaştırma <span class="rg"><input type="range" id="zoom" min="1" max="5" step="0.1" value="1"><span class="v" id="zoomVal">1</span></span></label>
     <button id="btnRun" class="primary big">▶ Başlat</button>
     <button id="btnTest" class="big">🔊 Türkçe sesi dene</button>
-  </div>
-
-  <div class="card">
-    <div id="stage">
-      <video id="video" muted playsinline></video>
-      <canvas id="overlay"></canvas>
-      <div id="ph">"Telefon kamerasını aç" deyin ve telefonu TV'ye doğrultun</div>
-    </div>
-    <div id="live">Alt yazı otomatik bulunacak. İsterseniz parmağınızla bölgeyi kendiniz de çizebilirsiniz.</div>
-    <div class="btns" style="margin-top:8px">
-      <button id="btnAuto">🔍 Alt yazıyı otomatik bul</button>
-    </div>
-  </div>
-
-  <div class="card">
-    <div id="subBox">
-      <div id="trText">—</div>
-      <div id="ogText"></div>
-    </div>
-    <div class="btns" style="margin-top:8px">
-      <button id="fsBtn">⛶ Alt yazıyı tam ekran yap</button>
-    </div>
   </div>
 
   <div class="card">
@@ -148,7 +147,7 @@ ol{padding-left:18px;margin:8px 0}li{margin:4px 0}
     <summary>Okuma ayarları</summary>
     <label class="row">Alt yazıyı otomatik bul <input type="checkbox" id="autoFind" checked data-save></label>
     <label class="row">Alt yazı açık renkli (beyaz/sarı) <input type="checkbox" id="lightText" checked data-save></label>
-    <label class="row">Tarama aralığı (ms) <span class="rg"><input type="range" id="interval" min="80" max="800" step="10" value="250" data-save><span class="v" id="intervalVal"></span></span></label>
+    <label class="row">Tarama aralığı (ms) <span class="rg"><input type="range" id="interval" min="80" max="800" step="10" value="180" data-save><span class="v" id="intervalVal"></span></span></label>
     <label class="row">Kararlılık (kare) <span class="rg"><input type="range" id="stable" min="1" max="4" step="1" value="2" data-save><span class="v" id="stableVal"></span></span></label>
     <label class="row">Min. güven (%) <span class="rg"><input type="range" id="minConf" min="20" max="90" step="1" value="45" data-save><span class="v" id="minConfVal"></span></span></label>
     <p class="hint">Programın gördüğü görüntü (yazı koyu, zemin açık olmalı):</p>
@@ -257,16 +256,16 @@ function targetRate(it){
   if($('autoRate').checked&&gaps.length>=3){
     const s=[...gaps].sort((a,b)=>a-b), med=s[s.length>>1];
     const need=(it.text.length/15)/(med*0.9);
-    if(need>r) r=Math.min(need,1.8);
+    if(need>r) r=Math.min(need,1.9);
   }
-  if(cur) r*=1.15;
+  r*=1+0.25*q.length;               // bekleyen satır varsa hızlan
   return Math.min(2,Math.max(0.5,r));
 }
 let lastDelay=0;
 function speak(text,profKey,force,t0){
   const it={text,prof:PROFILES[profKey]||PROFILES.erkek,t0};
   if(force||($('cut').checked&&(cur||q.length))){ q.length=0; cur=null; speechSynthesis.cancel(); }
-  else if(q.length) q.length=0;   // geride kalmamak için bekleyen eski satırı at
+  else if(q.length>=4) q.shift();   // çok aşırı birikirse en eskiyi at
   q.push(it); setTimeout(pump,40);
 }
 function pump(){
@@ -478,8 +477,8 @@ $('autoFind').addEventListener('change',()=>{ resetFind(); });
 /* ================= Görüntü hazırlama + OCR ================= */
 const work=document.createElement('canvas'), wctx=work.getContext('2d',{willReadFrequently:true});
 const proc=$('proc'), pctx=proc.getContext('2d');
-function prep(sx,sy,sw,sh,maxW){
-  const scale=Math.min(maxW/sw,3);
+function prep(sx,sy,sw,sh,maxW,maxH){
+  const scale=Math.min(maxW/sw,maxH?maxH/sh:3,3);
   const W=Math.max(8,Math.round(sw*scale)), H=Math.max(8,Math.round(sh*scale));
   work.width=W; work.height=H;
   wctx.drawImage(video,sx,sy,sw,sh,0,0,W,H);
@@ -506,19 +505,26 @@ function prep(sx,sy,sw,sh,maxW){
 }
 function fpDiff(a,b){ let s=0; for(let i=0;i<a.length;i++) s+=Math.abs(a[i]-b[i]); return s/a.length; }
 
-let worker=null, workerLang=null, curPsm=null;
+let worker=null, workerLang=null; const pool=[];
 async function ensureWorker(){
   const lang=$('ocrLang').value;
   if(worker&&workerLang===lang) return;
   setStatus('Okuma motoru yükleniyor…','warn');
   setLive('Okuma motoru indiriliyor (ilk seferde 10–20 sn sürebilir)…');
-  if(worker){ try{await worker.terminate()}catch(e){} }
-  worker=await Tesseract.createWorker(lang,1);
-  workerLang=lang; curPsm=null;
+  const old=[worker,...pool.map(x=>x.w)].filter(Boolean); worker=null; pool.length=0;
+  for(const w of old){ try{await w.terminate()}catch(e){} }
+  worker=await Tesseract.createWorker(lang,1);                       // tüm ekranda arama
+  await worker.setParameters({tessedit_pageseg_mode:'11'});
+  const n=Math.min(2,Math.max(1,(navigator.hardwareConcurrency||4)>>1));
+  for(let i=0;i<n;i++){                                               // alt yazı bölgesini paralel okuyanlar
+    const w=await Tesseract.createWorker(lang,1);
+    await w.setParameters({tessedit_pageseg_mode:'6',preserve_interword_spaces:'1'});
+    pool.push({w,busy:false,cv:document.createElement('canvas')});
+  }
+  workerLang=lang;
 }
 async function ocr(psm,lines){
-  if(curPsm!==psm){ await worker.setParameters({tessedit_pageseg_mode:psm,preserve_interword_spaces:'1'}); curPsm=psm; }
-  const {data}=await worker.recognize(work,{},lines?{text:true,blocks:true}:{text:true});
+  const {data}=await worker.recognize(work,{},{text:true,blocks:true});
   return data;
 }
 function getLines(data){
@@ -576,14 +582,21 @@ async function fullScan(){
 }
 /* Kilitli bölgeyi oku */
 let lastFP=null, lastOcrText='', lastConf=0;
+let jobSeq=0, doneSeq=0;
 async function regionScan(r){
+  const slot=pool.find(x=>!x.busy); if(!slot) return;               // iki okuyucu da meşgulse bu kareyi atla
   const vw=video.videoWidth, vh=video.videoHeight;
   const sx=Math.round(r.x*vw), sy=Math.round(r.y*vh), sw=Math.round(r.w*vw), sh=Math.round(r.h*vh);
   if(sw<10||sh<5) return;
-  const p=prep(sx,sy,sw,sh,900);
+  const p=prep(sx,sy,sw,sh,1100,220);
   if(lastFP&&fpDiff(p.fp,lastFP)<(srcType==='telefon'?0.02:0.008)){ handleText(lastOcrText,lastConf); return; }
   lastFP=p.fp;
-  const data=await ocr('6',false);
+  slot.cv.width=p.W; slot.cv.height=p.H; slot.cv.getContext('2d').drawImage(work,0,0);
+  slot.busy=true; const seq=++jobSeq;
+  slot.w.recognize(slot.cv).then(({data})=>{ if(seq>doneSeq){ doneSeq=seq; afterRegion(data); } })
+    .catch(e=>console.error(e)).finally(()=>{ slot.busy=false; });
+}
+function afterRegion(data){
   lastOcrText=cleanText(data.text); lastConf=data.confidence;
   if(goodText(lastOcrText,lastConf)){ lastSeen=performance.now(); setLive('Görülen: <b>'+esc(lastOcrText)+'</b> (güven %'+Math.round(lastConf)+')'); }
   else setLive(lastOcrText?'Belirsiz: '+esc(lastOcrText)+' (güven %'+Math.round(lastConf)+')':'Bölgede yazı yok, bekleniyor…');
@@ -623,7 +636,7 @@ function handleText(t,conf){
   }
   if(cand&&sim(n,cand)>0.7){ candN++; if(t.length>=candRaw.length) candRaw=t; }
   else { cand=n; candN=1; candT=now; candRaw=t; if($('mode').value!=='orijinal'){ const sp=parseSpeaker(t); translate(sp?sp.text:t).catch(()=>{}); } }
-  if(candN>=+$('stable').value||(candN===1&&conf>=75)){
+  if(candN>=+$('stable').value||conf>=65){
     recent.push({n:cand,first:now,last:now}); if(recent.length>8) recent.shift();
     const raw=candRaw, t0=candT; cand=null; candN=0;
     if(lastEmitWall){ const gap=(now-lastEmitWall)/1000; if(gap>0.6&&gap<12){ gaps.push(gap); if(gaps.length>8) gaps.shift(); } }
@@ -769,7 +782,11 @@ $('btnRun').onclick=async()=>{
   setLive($('autoFind').checked?'Alt yazı aranıyor…':'Seçili bölge okunuyor…');
   tick();
 };
-$('fsBtn').onclick=()=>{ const el=$('subBox'); if(document.fullscreenElement) document.exitFullscreen(); else el.requestFullscreen().catch(()=>{}); };
+$('fsBtn').onclick=async()=>{
+  if(document.fullscreenElement){ document.exitFullscreen(); return; }
+  try{ await $('stage').requestFullscreen(); await screen.orientation.lock('landscape'); }catch(e){}
+};
+document.addEventListener('fullscreenchange',()=>{ if(!document.fullscreenElement){ try{screen.orientation.unlock()}catch(e){} } setTimeout(sizeOverlay,300); });
 </script>
 </body>
 </html>
